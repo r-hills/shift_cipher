@@ -1,0 +1,5 @@
+name = "Shift Cipher"
+description = Lets the user shift an input string either direction by the number they enter.
+package = Epicodus Modules
+core = "7.x"
+files[] = shift_cipher.module
