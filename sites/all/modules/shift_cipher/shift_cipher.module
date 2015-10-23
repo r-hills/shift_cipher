@@ -26,19 +26,23 @@ function shift_cipher_form() {
         '#title' => 'String to Cipher',
         '#type' => 'textfield',
         '#description' => t('Please enter a string'),
+        '#element_validate' => array('element_validate_input_string'),
+        '#required' => TRUE,
     );
 
     $form['shift_direction'] = array(
         '#title' => 'Shift Direction',
-        '#type' => 'select',
-        '#options' => array('right', 'left'),
-//        '#description' => t('Enter the direction to shift the string'),
+        '#type' => 'textfield',
+        '#description' => t('Enter the word "right" or "left".'),
+        '#element_validate' => array('element_validate_ridiculous'),
+        '#required' => TRUE,
     );
 
     $form['shift_number'] = array(
         '#title' => 'Number to Shift',
         '#type' => 'textfield',
-        '#description' => t('Enter the number of places to shift.'),
+        '#description' => t('Enter the number of places to shift (1-25).'),
+        '#element_validate' => array('element_validate_integer_positive','element_validate_range'),
     );
 
     $form['submit'] = array(
@@ -51,17 +55,50 @@ function shift_cipher_form() {
 }
 
 function shift_cipher_form_submit($form, &$form_state) {
+    $string_to_shift = $form_state['values']['cipher_string'];
+    $shift_number = $form_state['values']['shift_number'];
+    $direction = $form_state['values']['shift_direction'];
+
+    $result = array(); 
+    $chars = str_split($string_to_shift);
+
+    if($direction == 'left') {
+        $shift_number = 0 - $shift_number + 26;
+    }
+ 
+    foreach( $chars as $indx => $char ) {
+        $result[$indx] = chr(97 + (ord($char) - 97 + $shift_number) % 26 );
+    }
+
+    $output = join("", $result); 
+
+    $_SESSION['results'] = "<h2>" . $output . "</h2>";
     $form_state['redirect'] = 'shift_cipher_results_page';
 }
 
 function shift_cipher_results() {
-    return 'In the form results page';
+    return $_SESSION['results'];
 }
 
 function element_validate_input_string($element) { 
     $formatted_string = strtolower($element['#value']);
-    echo $formatted_string; 
-    if( ! preg_match('^[a-z .]', $formatted_string) ) {
+    
+    if( preg_match("/[^a-z .]/", $formatted_string) ) {
         form_error($element, t('Input string can only contain alphabetical characters, spaces, or periods'));
     }
 }
+
+function element_validate_range($element) {
+    if( $element['#value'] < 1 || $element['#value'] > 25 ) {
+        form_error($element, t('Number must be an integer from 1 to 25'));
+    } 
+}
+
+function element_validate_ridiculous($element) {
+    $formatted_string = strtolower($element['#value']);
+    if( !in_array($formatted_string, array('right','left')) ) {
+        form_error($element, t('NO!!  NOT LIKE THAT!!! READ THE INSTRUCTIONS!! ("right" or "left" ???...)'));
+    } 
+}
+
+
