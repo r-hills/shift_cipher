@@ -11,12 +11,12 @@ function shift_cipher_menu() {
         'type' => MENU_NORMAL_ITEM,
     );
 
-    // $items['shift_cipher_results_page'] = array(
-    //     'title' => 'Cipher',
-    //     'page callback' => 'shift_cipher_results',
-    //     'access callback' => TRUE,
-    //     'type' => MENU_NORMAL_ITEM,
-    // );
+    $items['shift_cipher_results_page'] = array(
+        'title' => 'Cipher',
+        'page callback' => 'shift_cipher_results',
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
 
     return $items; 
 }
@@ -48,4 +48,20 @@ function shift_cipher_form() {
 
     return $form; 
 
+}
+
+function shift_cipher_form_submit($form, &$form_state) {
+    $form_state['redirect'] = 'shift_cipher_results_page';
+}
+
+function shift_cipher_results() {
+    return 'In the form results page';
+}
+
+function element_validate_input_string($element) { 
+    $formatted_string = strtolower($element['#value']);
+    echo $formatted_string; 
+    if( ! preg_match('^[a-z .]', $formatted_string) ) {
+        form_error($element, t('Input string can only contain alphabetical characters, spaces, or periods'));
+    }
 }
