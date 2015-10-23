@@ -1,7 +1,7 @@
 <?php
 
 function shift_cipher_menu() {
-	$items = array(); 
+    $items = array(); 
 
     $items['shift_cipher'] = array(
         'title' => 'Shift Cipher',
@@ -58,7 +58,7 @@ function shift_cipher_form_submit($form, &$form_state) {
     $string_to_shift = $form_state['values']['cipher_string'];
     $shift_number = $form_state['values']['shift_number'];
     $direction = $form_state['values']['shift_direction'];
-
+   
     $result = array(); 
     $chars = str_split($string_to_shift);
 
@@ -67,7 +67,7 @@ function shift_cipher_form_submit($form, &$form_state) {
     }
  
     foreach( $chars as $indx => $char ) {
-        if( !in_array($char, array(" ",".")) ) { 
+        if( preg_match("/[a-z]/", $char) ) { 
             $result[$indx] = chr(97 + (ord($char) - 97 + $shift_number) % 26 );
         } else {
             $result[$indx] = $char; 
@@ -87,8 +87,8 @@ function shift_cipher_results() {
 function element_validate_input_string($element) { 
     $formatted_string = strtolower($element['#value']);
     
-    if( preg_match("/[^a-z .]/", $formatted_string) ) {
-        form_error($element, t('Input string can only contain alphabetical characters, spaces, or periods'));
+    if( preg_match("/[^a-z .,-_!?:;'()]/", $formatted_string) ) {
+        form_error($element, t('Input string can only contain alphabetical characters, spaces, or punctuation'));
     }
 }
 
