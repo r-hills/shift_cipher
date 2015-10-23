@@ -63,11 +63,15 @@ function shift_cipher_form_submit($form, &$form_state) {
     $chars = str_split($string_to_shift);
 
     if($direction == 'left') {
-        $shift_number = 0 - $shift_number + 26;
+        $shift_number = 26 - $shift_number;
     }
  
     foreach( $chars as $indx => $char ) {
-        $result[$indx] = chr(97 + (ord($char) - 97 + $shift_number) % 26 );
+        if( !in_array($char, array(" ",".")) ) { 
+            $result[$indx] = chr(97 + (ord($char) - 97 + $shift_number) % 26 );
+        } else {
+            $result[$indx] = $char; 
+        }
     }
 
     $output = join("", $result); 
