@@ -55,7 +55,7 @@ function shift_cipher_form() {
 }
 
 function shift_cipher_form_submit($form, &$form_state) {
-    $string_to_shift = $form_state['values']['cipher_string'];
+    $string_to_shift = strtolower($form_state['values']['cipher_string']);
     $shift_number = $form_state['values']['shift_number'];
     $direction = $form_state['values']['shift_direction'];
    
@@ -63,25 +63,27 @@ function shift_cipher_form_submit($form, &$form_state) {
     $chars = str_split($string_to_shift);
 
     if($direction == 'left') {
+        // A shift to the left is handled as a shift to the right of a different value
         $shift_number = 26 - $shift_number;
     }
  
     foreach( $chars as $indx => $char ) {
-        if( preg_match("/[a-z]/", $char) ) { 
+        if( preg_match("/[a-z]/", $char) ) {
+            // ASCII value for lower case character is retrieved and adjusted to 0-25             
+            // It's adjusted with shift value, and brought down to 0-25 again
+            // Then added to 97 and used to retrieve the shifted character 
             $result[$indx] = chr(97 + (ord($char) - 97 + $shift_number) % 26 );
         } else {
             $result[$indx] = $char; 
         }
     }
 
-    $output = join("", $result); 
-
-    $_SESSION['results'] = "<h2>" . $output . "</h2>";
+    $_SESSION['results'] = join("", $result);
     $form_state['redirect'] = 'shift_cipher_results_page';
 }
 
 function shift_cipher_results() {
-    return $_SESSION['results'];
+    return "<h2>" . $_SESSION['results'] . "</h2>";
 }
 
 function element_validate_input_string($element) { 
